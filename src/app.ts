@@ -1,13 +1,18 @@
 import express from 'express';
 import authRoutes from './routes/auth.route';
 import healthRoutes from './routes/health.route';
+
 import { errorHandler } from './middlewares/errorHandler';
+import authorizationMiddleware from './middlewares/authorization';
 
 const app = express();
 app.use(express.json());
 
 app.use('/auth', authRoutes);
 app.use('/health', healthRoutes);
+
+app.use(authorizationMiddleware);
+
 
 app.use(errorHandler);
 
