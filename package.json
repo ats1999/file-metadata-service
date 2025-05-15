@@ -13,11 +13,16 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^6.8.0",
-    "express": "^5.1.0"
+    "bcrypt": "^6.0.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.1",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.15.18",
+    "prisma": "^6.8.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
   }
