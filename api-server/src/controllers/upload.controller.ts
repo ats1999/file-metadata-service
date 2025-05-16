@@ -3,7 +3,14 @@ import multer from "multer";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { PrismaClient } from "@prisma/client";
+import bytes from "bytes";
 import fileProcessingQueue from "../jobs/fileProcessingQueue";
+
+const FILE_UPLOAD_PATH = process.env.FILE_UPLOAD_PATH || "./uploads";
+const UPLOAD_FILE_SIZE_LIMIT = process.env.UPLOAD_FILE_SIZE_LIMIT || "";
+const UPLOAD_FILE_SIZE_LIMIT_DEFAULT = 10 * 1024 * 1024; // 10 MB
+const fileSizeLimit =
+  bytes(UPLOAD_FILE_SIZE_LIMIT) || UPLOAD_FILE_SIZE_LIMIT_DEFAULT;
 
 const prisma = new PrismaClient();
 
@@ -18,14 +25,16 @@ const jobOptions = {
 // Configure multer for file uploads
 const upload = multer({
   storage: multer.diskStorage({
-    destination: "./uploads",
+    destination: FILE_UPLOAD_PATH,
     filename: (req, file, cb) => {
       req.fileId = `${uuidv4()}${path.extname(file.originalname)}`;
       cb(null, req.fileId);
     },
   }),
-  // TODO: make file limit configurable
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB default file size limit
+
+  limits: {
+    fileSize: fileSizeLimit,
+  },
 }).single("file");
 
 export const uploadFile = async (req: Request, res: Response) => {
@@ -56,7 +65,7 @@ export const uploadFile = async (req: Request, res: Response) => {
         data: {
           user_id: req.tokenPayload.userId,
           original_filename: file.originalname,
-          storage_path: `uploads/${req.fileId}`,
+          storage_path: `${FILE_UPLOAD_PATH}/${req.fileId}`,
           title: title || null,
           description: description || null,
           status: "uploaded",
