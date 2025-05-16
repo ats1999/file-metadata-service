@@ -3,6 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaClient } from '@prisma/client';
+import fileProcessingQueue from '../jobs/fileProcessingQueue';
 
 const prisma = new PrismaClient();
 
@@ -33,10 +34,15 @@ export const uploadFile = async (req: Request, res: Response) => {
         }
 
         try {
+            // Ensure user_id is present
+            if (!req.tokenPayload?.userId) {
+                return res.status(400).json({ error: 'User ID is missing from token payload' });
+            }
+
             // Save metadata and file path to the database
             const fileRecord = await prisma.files.create({
                 data: {
-                    user_id: req.tokenPayload?.userId,
+                    user_id: req.tokenPayload.userId,
                     original_filename: file.originalname,
                     storage_path: `uploads/${req.fileId}`,
                     title: title || null,
@@ -44,6 +50,16 @@ export const uploadFile = async (req: Request, res: Response) => {
                     status: "uploaded",
                 },
             });
+
+            fileProcessingQueue.add(
+                'fileProcessing', // Job name
+                {
+                    fileId: fileRecord.id,
+                    userId: fileRecord.user_id,
+                    storagePath: fileRecord.storage_path,
+                },
+                { attempts: 3 } // Optional job options
+            );
 
             res.status(200).json({
                 fileId: fileRecord.id,
