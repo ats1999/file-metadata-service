@@ -1,7 +1,8 @@
+import "dotenv/config";
 import express from "express";
 import authRoutes from "./routes/auth.route";
 import healthRoutes from "./routes/health.route";
-import uploadRoutes from "./routes/upload.route";
+import fileRoutes from "./routes/file.route";
 
 import { errorHandler } from "./middlewares/errorHandler";
 import authorizationMiddleware from "./middlewares/authorization";
@@ -13,7 +14,7 @@ app.use("/auth", authRoutes);
 app.use("/health", healthRoutes);
 
 app.use(authorizationMiddleware);
-app.use("/uploads", uploadRoutes);
+app.use("/files", fileRoutes);
 
 app.use(errorHandler);
 

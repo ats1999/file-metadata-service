@@ -91,3 +91,36 @@ export const uploadFile = async (req: Request, res: Response) => {
     }
   });
 };
+
+export const getFileInfo = async (req: Request, res: Response) => {
+  const userId = req.tokenPayload?.userId;
+  if (!userId) {
+    res.status(401).json({ error: "Please login to continue" });
+    return;
+  }
+
+  const { fileId } = req.params;
+
+  try {
+    const fileRecord = await prisma.files.findUnique({
+      where: { id: Number(fileId), user_id: userId },
+    });
+
+    if (!fileRecord) {
+      res.status(404).json({ error: "File not found" });
+      return;
+    }
+
+    const fileInfo = {
+      title: fileRecord.title,
+      description: fileRecord.description,
+      status: fileRecord.status,
+      metaData: fileRecord.extracted_data,
+    };
+
+    res.status(200).json(fileInfo);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to retrieve file info" });
+  }
+};
