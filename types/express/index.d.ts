@@ -4,6 +4,7 @@ declare global {
   namespace Express {
     interface Request {
       tokenPayload?: TokenPayload;
+      fileId?: string;
     }
   }
 }

@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import TokenPayload from '../interfaces/TokenPayload';
 
 // TODO: move this to common function and remove default value
-const SECRET_KEY = process.env.JWT_SECRET || 'your-secret-key';
+const SECRET_KEY = process.env.JWT_SECRET || 'your_jwt_secret';
 
 
 const authorizationMiddleware = (
