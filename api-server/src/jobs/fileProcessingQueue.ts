@@ -1,13 +1,9 @@
 import { Queue } from 'bullmq';
 import connection from '../redis';
+import FileJobData from '../interfaces/FileJobData';
 
-interface FileJobData {
-    fileId: number;
-    userId: number;
-    storagePath: string
-}
 
-// Define a queue with typed job data
+// TODO: get queue name from env
 const fileQueue = new Queue<FileJobData>('file-processing', { connection });
 
 export default fileQueue;

@@ -55,7 +55,6 @@ export const uploadFile = async (req: Request, res: Response) => {
                 'fileProcessing', // Job name
                 {
                     fileId: fileRecord.id,
-                    userId: fileRecord.user_id,
                     storagePath: fileRecord.storage_path,
                 },
                 { attempts: 3 } // Optional job options
