@@ -29,13 +29,13 @@ const fileProcessorWorker = new Worker<FileJobData>(
 
     // Read file stats
     const stats = await fs.stat(storagePath);
-    const fileType = getFileType(storagePath);
     const size = stats.size;
+    const fileType = getFileType(storagePath);
     const checkSum = await calculateChecksum(storagePath);
 
     const extractedData = {
-      fileType: fileType,
       size,
+      fileType: fileType,
       checksum: checkSum,
     };
 
