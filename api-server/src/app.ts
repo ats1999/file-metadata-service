@@ -1,24 +1,24 @@
-import express from 'express';
-import authRoutes from './routes/auth.route';
-import healthRoutes from './routes/health.route';
-import uploadRoutes from './routes/upload.route';
+import express from "express";
+import authRoutes from "./routes/auth.route";
+import healthRoutes from "./routes/health.route";
+import uploadRoutes from "./routes/upload.route";
 
-import { errorHandler } from './middlewares/errorHandler';
-import authorizationMiddleware from './middlewares/authorization';
+import { errorHandler } from "./middlewares/errorHandler";
+import authorizationMiddleware from "./middlewares/authorization";
 
 const app = express();
 app.use(express.json());
 
-app.use('/auth', authRoutes);
-app.use('/health', healthRoutes);
+app.use("/auth", authRoutes);
+app.use("/health", healthRoutes);
 
 app.use(authorizationMiddleware);
-app.use('/uploads', uploadRoutes);
+app.use("/uploads", uploadRoutes);
 
 app.use(errorHandler);
 
-app.get('/', (_req, res) => {
-    res.send('Hello TypeScript with Express!');
+app.get("/", (_req, res) => {
+  res.send("Hello TypeScript with Express!");
 });
 
 export default app;
