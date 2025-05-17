@@ -93,12 +93,7 @@ export const uploadFile = async (req: Request, res: Response) => {
 };
 
 export const getFileInfo = async (req: Request, res: Response) => {
-  const userId = req.tokenPayload?.userId;
-  if (!userId) {
-    res.status(401).json({ error: "Please login to continue" });
-    return;
-  }
-
+  const { userId } = req.tokenPayload!;
   const { fileId } = req.params;
 
   try {
@@ -123,4 +118,36 @@ export const getFileInfo = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).json({ error: "Failed to retrieve file info" });
   }
+};
+
+export const getFilesInfo = async (req: Request, res: Response) => {
+  const { userId } = req.tokenPayload!;
+  const { page = 1, limit = 10 } = req.query;
+  const pageNumber = parseInt(page as string, 10);
+  const limitNumber = parseInt(limit as string, 10);
+  const offset = (pageNumber - 1) * limitNumber;
+
+  const files = await prisma.files.findMany({
+    where: { user_id: userId },
+    skip: offset,
+    take: limitNumber,
+    orderBy: {
+      uploaded_at: "desc",
+    },
+  });
+
+  const filesInfo = files.map((file) => ({
+    id: file.id,
+    title: file.title,
+    description: file.description,
+    status: file.status,
+    uploadedAt: file.uploaded_at,
+    metaData: file.extracted_data,
+  }));
+
+  res.status(200).json({
+    files: filesInfo,
+    currentPage: pageNumber,
+    limit: limitNumber,
+  });
 };
