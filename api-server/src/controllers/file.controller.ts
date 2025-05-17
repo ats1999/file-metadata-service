@@ -7,7 +7,7 @@ import bytes from "bytes";
 import fileProcessingQueue from "../jobs/fileProcessingQueue";
 import { getMaxJobRetry } from "../utils";
 
-const FILE_UPLOAD_PATH = process.env.FILE_UPLOAD_PATH || "./uploads";
+const FILE_UPLOAD_BASE_PATH = process.env.FILE_UPLOAD_BASE_PATH || "./uploads";
 const UPLOAD_FILE_SIZE_LIMIT = process.env.UPLOAD_FILE_SIZE_LIMIT || "";
 const UPLOAD_FILE_SIZE_LIMIT_DEFAULT = 10 * 1024 * 1024; // 10 MB
 const fileSizeLimit =
@@ -26,7 +26,7 @@ const jobOptions = {
 // Configure multer for file uploads
 const upload = multer({
   storage: multer.diskStorage({
-    destination: FILE_UPLOAD_PATH,
+    destination: FILE_UPLOAD_BASE_PATH,
     filename: (req, file, cb) => {
       req.fileId = `${uuidv4()}${path.extname(file.originalname)}`;
       cb(null, req.fileId);
@@ -77,7 +77,7 @@ export const uploadFile = async (req: Request, res: Response) => {
         data: {
           user_id: req.tokenPayload.userId,
           original_filename: file.originalname,
-          storage_path: `${FILE_UPLOAD_PATH}/${req.fileId}`,
+          storage_path: `${FILE_UPLOAD_BASE_PATH}/${req.fileId}`,
           title: title || null,
           description: description || null,
           status: "uploaded",

@@ -11,7 +11,7 @@ WORKDIR /app
 
 # Copy package files and install dependencies
 COPY api-server ./
-RUN npm install
+RUN npm install && npm run build
 
 EXPOSE 3000
 
@@ -28,4 +28,4 @@ EXPOSE 3000
 CMD service postgresql start && \
     service redis-server start && \
     # psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -f ./schema.sql || true && \
-    npm run dev
+    npm start

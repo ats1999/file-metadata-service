@@ -3,9 +3,9 @@ import { PrismaClient } from "@prisma/client";
 import { createHash } from "crypto";
 import * as fs from "fs/promises";
 import path from "path";
-import FileJobData from "../interfaces/FileJobData";
-import connection from "../redis";
-import { getMaxJobRetry, isRandomFailure, randomNumber, sleep } from "../utils";
+import FileJobData from "./interfaces/FileJobData";
+import connection from "./redis";
+import { getMaxJobRetry, isRandomFailure, randomNumber, sleep } from "./utils";
 
 const prisma = new PrismaClient();
 
