@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { PrismaClient } from "@prisma/client";
 import bytes from "bytes";
 import fileProcessingQueue from "../jobs/fileProcessingQueue";
+import { getMaxJobRetry } from "../utils";
 
 const FILE_UPLOAD_PATH = process.env.FILE_UPLOAD_PATH || "./uploads";
 const UPLOAD_FILE_SIZE_LIMIT = process.env.UPLOAD_FILE_SIZE_LIMIT || "";
@@ -15,7 +16,7 @@ const fileSizeLimit =
 const prisma = new PrismaClient();
 
 const jobOptions = {
-  attempts: 3,
+  attempts: getMaxJobRetry(),
   backoff: {
     type: "exponential",
     delay: 1000, // 1 second delay before retrying
@@ -36,6 +37,17 @@ const upload = multer({
     fileSize: fileSizeLimit,
   },
 }).single("file");
+
+function buildFileInfo(fileRecord: any) {
+  return {
+    id: fileRecord.id,
+    title: fileRecord.title,
+    description: fileRecord.description,
+    status: fileRecord.status,
+    uploadedAt: fileRecord.uploaded_at,
+    metaData: fileRecord.extracted_data,
+  };
+}
 
 export const uploadFile = async (req: Request, res: Response) => {
   upload(req, res, async (err) => {
@@ -106,12 +118,7 @@ export const getFileInfo = async (req: Request, res: Response) => {
       return;
     }
 
-    const fileInfo = {
-      title: fileRecord.title,
-      description: fileRecord.description,
-      status: fileRecord.status,
-      metaData: fileRecord.extracted_data,
-    };
+    const fileInfo = buildFileInfo(fileRecord);
 
     res.status(200).json(fileInfo);
   } catch (error) {
@@ -136,14 +143,7 @@ export const getFilesInfo = async (req: Request, res: Response) => {
     },
   });
 
-  const filesInfo = files.map((file) => ({
-    id: file.id,
-    title: file.title,
-    description: file.description,
-    status: file.status,
-    uploadedAt: file.uploaded_at,
-    metaData: file.extracted_data,
-  }));
+  const filesInfo = files.map(buildFileInfo);
 
   res.status(200).json({
     files: filesInfo,

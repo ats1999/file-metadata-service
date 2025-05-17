@@ -5,6 +5,7 @@ import * as fs from "fs/promises";
 import path from "path";
 import FileJobData from "../interfaces/FileJobData";
 import connection from "../redis";
+import { getMaxJobRetry, isRandomFailure, randomNumber, sleep } from "../utils";
 
 const prisma = new PrismaClient();
 
@@ -27,6 +28,22 @@ const fileProcessorWorker = new Worker<FileJobData>(
   async (job: Job<FileJobData>) => {
     const { fileId, storagePath } = job.data;
 
+    // simulate file processing
+    await prisma.files.update({
+      where: { id: fileId },
+      data: {
+        status: "processing",
+      },
+    });
+
+    // Simulate processing time
+    await sleep(randomNumber(0, 5000));
+
+    // Simulate random failure
+    if (isRandomFailure()) {
+      throw new Error("Random failure occurred during file processing");
+    }
+
     // Read file stats
     const stats = await fs.stat(storagePath);
     const size = stats.size;
@@ -44,6 +61,7 @@ const fileProcessorWorker = new Worker<FileJobData>(
       where: { id: fileId },
       data: {
         extracted_data: extractedData,
+        status: "processed",
       },
     });
   },
@@ -54,6 +72,20 @@ fileProcessorWorker.on("completed", (job) => {
   console.log(`Processed file ${job.data.fileId}`);
 });
 
-fileProcessorWorker.on("failed", (job, err) => {
-  console.error(`Failed processing file job ${job?.data.fileId}:`, err);
+fileProcessorWorker.on("failed", async (job, err) => {
+  if (job?.attemptsMade! < getMaxJobRetry()) {
+    return;
+  }
+
+  console.error(
+    `Failed to process file ${job?.data.fileId}: ${err.message}`,
+    err.stack
+  );
+
+  await prisma.files.update({
+    where: { id: job?.data.fileId },
+    data: {
+      status: "failed",
+    },
+  });
 });
