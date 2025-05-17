@@ -18,38 +18,38 @@ services:
     ports:
       - "6379:6379"
 
-  api-server:
-    build:
-      context: ./api-server
-      dockerfile: Dockerfile
-    depends_on:
-      - postgres
-      - redis
-    environment:
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: appdb
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-    ports:
-      - "3000:3000"
-    command: >
-      sh -c "
-      ./wait-for-postgres.sh && 
-      npm start
-      "
+  # api-server:
+  #   build:
+  #     context: ./api-server
+  #     dockerfile: Dockerfile
+  #   env_file: ./api-server/.env
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #   environment:
+  #     POSTGRES_HOST: postgres
+  #     POSTGRES_PORT: 5432
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: appdb
+  #     REDIS_HOST: redis
+  #     REDIS_PORT: 6379
+  #   ports:
+  #     - "3000:3000"
+  #   command: >
+  #     sh -c "
+  #     ./wait-for-postgres.sh &&
+  #     npm start
+  #     "
 
   file-processor:
     build:
       context: ./file-processor
       dockerfile: Dockerfile
+    env_file: ./file-processor/.env
     depends_on:
-      - api-server
-    command: >
-      sh -c "
-      npm start
-      "
+      - postgres
+      - redis
+      # - api-server
 volumes:
   pgdata:
