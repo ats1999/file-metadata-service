@@ -1,19 +1,16 @@
 # Use official Node.js LTS image
-FROM node:18
+FROM node:20
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install && npx prisma generate
+RUN npm install
 
 # Copy the rest of the application files
 COPY . .
 
-RUN npm run build
+RUN npx prisma generate && npm run build
 
 # Start the application
 CMD ["npm", "start"]
