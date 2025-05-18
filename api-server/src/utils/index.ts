@@ -9,6 +9,6 @@ export function getUploadRateLimitOptions() {
   return {
     windowMs:
       Number(process.env.UPDATE_RATE_LIMIT_WINDOW_MS) || defaultWindowMs,
-    max: Number(process.env.MAX_UPLOAD_RATE_LIMIT_DAY) || defaultMaxLimit,
+    max: Number(process.env.MAX_UPLOAD_RATE_LIMIT) || defaultMaxLimit,
   };
 }
