@@ -7,7 +7,7 @@ import bytes from "bytes";
 import fileProcessingQueue from "../jobs/fileProcessingQueue";
 import { getMaxJobRetry } from "../utils";
 
-const FILE_UPLOAD_BASE_PATH = process.env.FILE_UPLOAD_BASE_PATH || "./uploads";
+const FILE_UPLOAD_BASE_PATH = process.env.FILE_UPLOAD_BASE_PATH || "/data";
 const UPLOAD_FILE_SIZE_LIMIT = process.env.UPLOAD_FILE_SIZE_LIMIT || "";
 const UPLOAD_FILE_SIZE_LIMIT_DEFAULT = 10 * 1024 * 1024; // 10 MB
 const fileSizeLimit =
