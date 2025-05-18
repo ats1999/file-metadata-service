@@ -24,14 +24,23 @@ User's upload files to `api-server`, `api-server` write file to local disk and p
    ```
 
 2. Run shell script to start services
+
    ```sh
-   # this will setup `.env` file and start container using docker compose
+   cd file-metadata-service
+
+   # this will setup `.env` files and start containers using docker compose
    sh deploy.sh
    ```
 
+3. Access api at http://localhost:3000/
+
+## API Documentation
+
+- https://documenter.getpostman.com/view/17357775/2sB2qXjN3S
+
 ## Rate Limiter
 
-`api-server` uses a rate limiter to limit the number of uploads a user can make within a specific time window. The rate limiter is implemented using the [Token Bucket algorithm](https://en.wikipedia.org/wiki/Token_bucket), which allows for a steady rate of requests with occasional bursts up to a defined limit.
+`api-server` uses a rate limiter to limit the number of uploads a user can make within a specific time window.
 
 You can configure the rate limiter settings in the `api-server/.env` service. Typical configuration options include:
 
